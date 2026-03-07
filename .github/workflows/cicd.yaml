@@ -13,11 +13,9 @@ env:
 
 jobs:
   build-and-push:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout source
         uses: actions/checkout@v4
 
@@ -29,7 +27,15 @@ jobs:
           cache: maven
 
       - name: Build entire project
+        # We pass the env variables here so Spring Boot tests don't fail
+        # due to missing placeholders in application.yml
         run: mvn -U clean install -DskipTests
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
+          # These should be stored in GitHub Secrets
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -42,12 +48,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build patient-intake image
+      - name: Build and Push patient-intake
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest ./patient-intake-service
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest
+          docker build -t ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:latest ./patient-intake-service
+          docker push ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:latest
 
-      - name: Build workflow-worker image
+      - name: Build and Push workflow-worker
         run: |
-          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$WORKFLOW_REPO:latest ./workflow-worker
-          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$WORKFLOW_REPO:latest
+          docker build -t ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.WORKFLOW_REPO }}:latest ./workflow-worker
+          docker push ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.WORKFLOW_REPO }}:latest
