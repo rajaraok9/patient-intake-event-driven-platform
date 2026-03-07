@@ -18,7 +18,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final SqsClient sqsClient;
 
-    @Value("${aws.sqs.url}")
+    @Value("${aws.sqs.queue-url}")
     private String queueUrl;
     @Autowired
     public PatientService(PatientRepository patientRepository, SqsClient sqsClient) {

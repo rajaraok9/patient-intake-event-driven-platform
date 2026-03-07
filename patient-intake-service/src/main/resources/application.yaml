@@ -1,27 +1,29 @@
 spring:
   application:
     name: patient-intake-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/patientdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
 
 server:
   port: 8888
 
-  datasource:
-     url: jdbc:mysql://localhost:3306/patientdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-     username: root
-     password: root
-     driver-class-name: com.mysql.cj.jdbc.Driver
-     jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          format_sql: true
-          dialect: org.hibernate.dialect.MySQLDialect
 aws:
   region: ${AWS_REGION:ap-south-1}
+  account-id: ${AWS_ACCOUNT_ID:000000000000}
   sqs:
-    queue-url: https://sqs.${aws.region}.amazonaws.com/${AWS_ACCOUNT_ID}/patient-intake-queue
+    # This builds the URL dynamically without hardcoding your ID
+    queue-url: https://sqs.${aws.region}.amazonaws.com/785640717631/patient-intake-queue
   credentials:
-    access-key: ${AWS_ACCESS_KEY_ID}
-    secret-key: ${AWS_SECRET_ACCESS_KEY}
+    access-key: ${AWS_ACCESS_KEY_ID:default-access-key}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:default-secret-key}
