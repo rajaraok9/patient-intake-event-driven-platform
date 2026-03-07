@@ -1,4 +1,4 @@
-name: Build and Push Microservices
+name: CI/CD Build and Push to ECR
 
 on:
   push:
@@ -7,52 +7,47 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY_PATIENT: patient-intake-service
-  ECR_REPOSITORY_WORKFLOW: workflow-worker
+  ACCOUNT_ID: 785640717631
+  PATIENT_REPO: patient-intake-service
+  WORKFLOW_REPO: workflow-worker
 
 jobs:
-
   build-and-push:
+
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Checkout repository
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+          cache: maven
 
-      - name: Build patient-intake-service
-        run: |
-          cd patient-intake-service
-          mvn clean package -DskipTests
+      - name: Build entire project
+        run: mvn -U clean package -DskipTests
 
-      - name: Build workflow-worker
-        run: |
-          cd workflow-worker
-          mvn clean package -DskipTests
-
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Patient Intake Image
+      - name: Build patient-intake image
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PATIENT }}:latest ./patient-intake-service
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PATIENT }}:latest
+          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest ./patient-intake-service
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PATIENT_REPO:latest
 
-      - name: Build and Push Workflow Worker Image
+      - name: Build workflow-worker image
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest ./workflow-worker
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest
+          docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$WORKFLOW_REPO:latest ./workflow-worker
+          docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$WORKFLOW_REPO:latest
