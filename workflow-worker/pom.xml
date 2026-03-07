@@ -10,6 +10,7 @@
         <groupId>org.modmed</groupId>
         <artifactId>healthcare-platform</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>workflow-worker</artifactId>
