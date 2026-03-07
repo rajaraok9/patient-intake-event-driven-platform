@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: workflow-worker
+
+
+server:
+  port: 9999
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/patientdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+          dialect: org.hibernate.dialect.MySQLDialect
+aws:
+  region: ${AWS_REGION:ap-south-1}
+  sqs:
+    queue-url: https://sqs.${aws.region}.amazonaws.com/${AWS_ACCOUNT_ID}/patient-intake-queue
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
