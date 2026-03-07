@@ -1,4 +1,4 @@
-name: CI/CD Build and Push to ECR
+name: Build and Push Microservices
 
 on:
   push:
@@ -7,53 +7,51 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ACCOUNT_ID: 785640717631
-  PATIENT_REPO: patient-intake-service
-  WORKFLOW_REPO: workflow-worker
+  ECR_REPOSITORY_PATIENT: patient-intake-service
+  ECR_REPOSITORY_WORKFLOW: workflow-worker
+  # Providing this prevents Spring from failing property resolution
+  AWS_ACCOUNT_ID: 785640717631
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup JDK
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: maven
 
-      - name: Build entire project
-        # We pass the env variables here so Spring Boot tests don't fail
-        # due to missing placeholders in application.yml
-        run: mvn -U clean install -DskipTests
+      - name: Build All Modules (Reactor Build)
+        # This is the "Project-Based" way. We build from the root
+        # so the children can see the Parent POM and AWS BOM.
+        run: mvn -U clean install -DskipTests -am
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
-          # These should be stored in GitHub Secrets
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }}
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to ECR
+      - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push patient-intake
+      - name: Build and Push Patient Intake Image
         run: |
-          docker build -t ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:latest ./patient-intake-service
-          docker push ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.PATIENT_REPO }}:latest
+          # The context is the child folder where the Dockerfile and Target live
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PATIENT }}:latest ./patient-intake-service
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PATIENT }}:latest
 
-      - name: Build and Push workflow-worker
+      - name: Build and Push Workflow Worker Image
         run: |
-          docker build -t ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.WORKFLOW_REPO }}:latest ./workflow-worker
-          docker push ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.WORKFLOW_REPO }}:latest
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest ./workflow-worker
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest
