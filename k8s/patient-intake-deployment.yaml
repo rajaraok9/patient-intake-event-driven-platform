@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patient-intake
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: patient-intake
+  template:
+    metadata:
+      labels:
+        app: patient-intake
+    spec:
+      containers:
+        - name: patient-intake
+          image: 785640717631.dkr.ecr.ap-south-1.amazonaws.com/patient-intake-service:latest
+          ports:
+            - containerPort: 8888

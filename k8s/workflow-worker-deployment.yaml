@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workflow-worker
+  template:
+    metadata:
+      labels:
+        app: workflow-worker
+    spec:
+      containers:
+        - name: workflow-worker
+          image: 785640717631.dkr.ecr.ap-south-1.amazonaws.com/workflow-worker:latest

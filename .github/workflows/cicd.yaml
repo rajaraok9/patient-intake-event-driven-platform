@@ -55,3 +55,19 @@ jobs:
         run: |
           docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest ./workflow-worker
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_WORKFLOW }}:latest
+          
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.29.0'
+
+      - name: Configure kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --region $AWS_REGION \
+            --name healthcare-cluster
+
+      - name: Deploy services to EKS
+        run: |
+          kubectl apply -f k8s/patient-intake-deployment.yaml
+          kubectl apply -f k8s/workflow-worker-deployment.yaml
