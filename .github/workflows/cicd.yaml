@@ -71,3 +71,4 @@ jobs:
         run: |
           kubectl apply -f k8s/patient-intake-deployment.yaml
           kubectl apply -f k8s/workflow-worker-deployment.yaml
+          kubectl apply -f k8s/patient-intake-service.yaml
