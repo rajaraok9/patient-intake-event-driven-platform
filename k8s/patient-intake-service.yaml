@@ -2,6 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: patient-intake-service
+  annotations:
+    # THIS IS THE FIX: Tells AWS to make it Public
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # Ensure your subnets are still listed
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-044be4b6377878633, subnet-0f4c29dd901bc3dcc, subnet-0e915b56be260da28"
 spec:
   type: LoadBalancer
   selector:
@@ -9,3 +14,4 @@ spec:
   ports:
     - port: 80
       targetPort: 8888
+      nodePort: 30880
