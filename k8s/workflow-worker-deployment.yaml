@@ -15,16 +15,36 @@ spec:
       containers:
         - name: workflow-worker
           image: 785640717631.dkr.ecr.ap-south-1.amazonaws.com/workflow-worker:latest
+
           env:
+            # AWS credentials for SQS
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: aws-sqs-credentials
                   key: access-key
+
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: aws-sqs-credentials
                   key: secret-key
+
             - name: AWS_REGION
               value: "ap-south-1"
+
+            # MySQL configuration (Amazon RDS)
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://healthcare-db.cnsu2okwc6v9.ap-south-1.rds.amazonaws.com:3306/healthcare
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: username
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: password
