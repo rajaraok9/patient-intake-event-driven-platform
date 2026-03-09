@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: patient-intake-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: patient-intake # Must match your Deployment name
+  minReplicaCount: 0     # Scales down to zero if no messages!
+  maxReplicaCount: 5   # Maximum 5 pods during a rush
+  cooldownPeriod:  30
+  pollingInterval: 5
+  triggers:
+    - type: aws-sqs
+      metadata:
+        queueURL: https://sqs.ap-south-1.amazonaws.com/785640717631/patient-intake-queue
+        queueLength: "5" # Target 5 messages per pod
+        awsRegion: "ap-south-1"
+      authenticationRef:
+        name: keda-aws-credentials

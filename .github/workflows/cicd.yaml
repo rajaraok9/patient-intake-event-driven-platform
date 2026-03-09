@@ -70,6 +70,8 @@ jobs:
 
       - name: Deploy services to EKS
         run: |
-          kubectl apply -f k8s/patient-intake-deployment.yaml
-          kubectl apply -f k8s/workflow-worker-deployment.yaml
           kubectl apply -f k8s/patient-intake-service.yaml
+          kubectl apply -f k8s/keda-auth.yaml 
+          kubectl apply -f k8s/patient-intake-deployment.yaml
+          kubectl apply -f k8s/keda-scaledobject.yaml
+          kubectl apply -f k8s/workflow-worker-deployment.yaml

@@ -1,0 +1,13 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-aws-credentials
+  namespace: default
+spec:
+  secretTargetRef:
+    - parameter: awsAccessKeyId
+      name: aws-sqs-credentials
+      key: access-key
+    - parameter: awsSecretAccessKey
+      name: aws-sqs-credentials
+      key: secret-key
