@@ -10,6 +10,7 @@ env:
   ECR_REPOSITORY_PATIENT: patient-intake-service
   ECR_REPOSITORY_WORKFLOW: workflow-worker
   # Providing this prevents Spring from failing property resolution
+  # and allows us to use the same application.yaml for local and cloud deployments.
   AWS_ACCOUNT_ID: 785640717631
 
 jobs:
