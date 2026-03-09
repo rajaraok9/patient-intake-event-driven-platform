@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   secretTargetRef:
-    - parameter: awsAccessKeyId
+    - parameter: awsAccessKeyID
       name: aws-sqs-credentials
       key: access-key
     - parameter: awsSecretAccessKey

@@ -15,3 +15,16 @@ spec:
       containers:
         - name: workflow-worker
           image: 785640717631.dkr.ecr.ap-south-1.amazonaws.com/workflow-worker:latest
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-sqs-credentials
+                  key: access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-sqs-credentials
+                  key: secret-key
+            - name: AWS_REGION
+              value: "ap-south-1"

@@ -11,10 +11,10 @@ spec:
   cooldownPeriod:  30
   pollingInterval: 5
   triggers:
-    - type: aws-sqs
+    - type: aws-sqs-queue
       metadata:
         queueURL: https://sqs.ap-south-1.amazonaws.com/785640717631/patient-intake-queue
         queueLength: "5" # Target 5 messages per pod
-        awsRegion: "ap-south-1"
+        awsRegion: ap-south-1
       authenticationRef:
         name: keda-aws-credentials
