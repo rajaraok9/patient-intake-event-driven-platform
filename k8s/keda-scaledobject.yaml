@@ -1,12 +1,12 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: patient-intake-scaler
+  name: workflow-worker-scaler
   namespace: default
 spec:
   scaleTargetRef:
-    name: patient-intake # Must match your Deployment name
-  minReplicaCount: 0     # Scales down to zero if no messages!
+    name: workflow-worker # Must match your Deployment name
+  minReplicaCount: 1     # Scales down to zero if no messages!
   maxReplicaCount: 5   # Maximum 5 pods during a rush
   cooldownPeriod:  30
   pollingInterval: 5
