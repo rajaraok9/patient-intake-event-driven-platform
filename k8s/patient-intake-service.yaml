@@ -6,7 +6,7 @@ metadata:
     # THIS IS THE FIX: Tells AWS to make it Public
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
     # Ensure your subnets are still listed
-    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-090f65b4da787f955,subnet-06807dd0d9bbd4332"
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-033e2ab2356dbd562, subnet-0c366c03e51921c0e"
 spec:
   type: LoadBalancer
   selector:
