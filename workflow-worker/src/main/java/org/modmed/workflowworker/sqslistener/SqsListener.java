@@ -60,7 +60,7 @@ public class SqsListener {
                     log.info("Received intake event for patientId: {}", patientId);
 
                     orchestrator.process(patientId);
-
+                    Thread.sleep(2000);
                     sqsClient.deleteMessage(DeleteMessageRequest.builder()
                             .queueUrl(queueUrl)
                             .receiptHandle(message.receiptHandle())
