@@ -16,6 +16,6 @@ spec:
         queueURL: https://sqs.ap-south-1.amazonaws.com/785640717631/patient-intake-queue
         queueLength: "1" # Target 1 message per pod
         awsRegion: ap-south-1
-#      authenticationRef:
-#        name: keda-aws-credentials
+      authenticationRef:
+        name: keda-aws-credentials
 #        # If you want to use TriggerAuthentication, uncomment the above lines and ensure the secret is set up correctly.
