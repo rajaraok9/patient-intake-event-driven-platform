@@ -6,15 +6,16 @@ metadata:
 spec:
   scaleTargetRef:
     name: workflow-worker # Must match your Deployment name
-  minReplicaCount: 1     # Scales down to zero if no messages!
+  minReplicaCount: 1     # Scales down to one if no messages!
   maxReplicaCount: 5   # Maximum 5 pods during a rush
-  cooldownPeriod:  30
-  pollingInterval: 5
+  cooldownPeriod:  30  # Wait 30 seconds before scaling down after processing messages
+  pollingInterval: 5 # Check every 5 seconds for new messages
   triggers:
-    - type: aws-sqs-queue
+    - type: aws-sqs-queue # Use the SQS queue as the trigger
       metadata:
         queueURL: https://sqs.ap-south-1.amazonaws.com/785640717631/patient-intake-queue
-        queueLength: "5" # Target 5 messages per pod
+        queueLength: "1" # Target 1 message per pod
         awsRegion: ap-south-1
-      authenticationRef:
-        name: keda-aws-credentials
+#      authenticationRef:
+#        name: keda-aws-credentials
+#        # If you want to use TriggerAuthentication, uncomment the above lines and ensure the secret is set up correctly.
